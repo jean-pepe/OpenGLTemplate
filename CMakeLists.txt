@@ -15,38 +15,40 @@ target_include_directories(glad PUBLIC external/glad/include)
 add_library(stb_image STATIC external/stb/stb_image.cpp)
 target_include_directories(stb_image PUBLIC external/stb)
 
-# Assimp --> Evita di costruire tool, test, e zlib interno
+# Assimp
 set(ASSIMP_BUILD_TESTS OFF)
 set(ASSIMP_NO_EXPORT ON)
 set(ASSIMP_BUILD_ASSIMP_TOOLS OFF)
-set(ASSIMP_BUILD_ZLIB ON) # o OFF se vuoi usare lo zlib di sistema
+set(ASSIMP_BUILD_ZLIB ON)
 add_subdirectory(external/assimp)
 
 # SDL3
+set(SDL_TEST OFF CACHE BOOL "" FORCE)
+set(SDL_INSTALL_TESTS OFF CACHE BOOL "" FORCE)
+set(SDL_SHARED OFF CACHE BOOL "" FORCE)
+set(SDL_STATIC ON CACHE BOOL "" FORCE)
 add_subdirectory(external/SDL)
-target_link_libraries(OpenGLApp PRIVATE SDL3::SDL3)
 
-# Executable
+# Executable (deve venire PRIMA del link e include)
 add_executable(OpenGLApp
     src/main.cpp
 )
 
-# Include directories
+# Include directories (dopo add_executable)
 target_include_directories(OpenGLApp PRIVATE
     external/glad/include
     external/glm
     external/stb
     external/imgui
-    ${GLFW_INCLUDE_DIRS}
 )
 
-# Link libraries
+# Link libraries (dopo add_executable)
 target_link_libraries(OpenGLApp
     glad
     stb_image
     assimp
     imgui
     spdlog::spdlog
-    ${GLFW_LIBRARIES}
+    SDL3::SDL3
     ${CMAKE_DL_LIBS}
 )
